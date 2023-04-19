@@ -1,0 +1,43 @@
+To solve the problem, it is necessary to create an API, which allows using a trained neural network to predict the price of fuel based on new input data.
+
+To do this, you can create a Flask application that will run the API. The application needs to define a route for fuel price prediction. The user will send a POST request to this route with new input data, and the API will return the fuel price prediction.
+
+An example of Flask application code with a route for fuel price prediction:
+
+from flask import flask, request, jsonify
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+
+# Load the trained neural network model
+model = keras.models.load_model('trained_model.h5')
+
+app = Flask(__name__)
+
+# Define the route for fuel price prediction
+@app.route('/predict_fuel_price', methods=['POST'])
+def predict_fuel_price():
+    # Get the input data from the request
+    data = request.get_json()
+
+    # Prepare the input data for the neural network
+    input_data = np.array([
+        [data['min_price'], data['max_price'], data['total_price']]
+    ])
+
+    # Use the neural network to make a price prediction
+    prediction = model.predict(input_data)[0][0]
+
+    # Return the predicted price as a JSON response
+    response = {
+        'predicted_price': prediction
+    }
+    return jsonify(response)
+
+If __name__ == '__main__':
+    app.run(debug=True)
+
+
+The app loads the trained model from the file "trained_model.h5". When the POST request for the route "/predict_fuel_price" is received, the application gets the data from the request and prepares it to enter the neural network. Then, using the neural network, it makes a prediction of the fuel price and returns it as a JSON response.
+
+A graphical user interface application can use this API to make fuel price predictions based on new data. To do this, the user can enter new values for the minimum and maximum fuel price, as well as the total sales amount, and send them to the "/predict_fuel_price" route as a POST request. The application will receive a JSON response with the predicted fuel price.
